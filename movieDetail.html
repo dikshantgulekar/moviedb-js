@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Movie Detail Page</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css"
+    />
+
+    <link rel="stylesheet" href="style.css" />
+    <style>
+      body {
+        background-color: #111;
+        color: #fff;
+        font-family: Arial, sans-serif;
+      }
+      .container {
+        display: flex;
+        padding: 20px;
+        gap: 20px;
+      }
+      #bgMovieImg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        opacity: 0.3;
+        z-index: -1;
+      }
+      .col-3 img {
+        width: 100%;
+        border-radius: 10px;
+      }
+      .movie-details {
+        flex: 1;
+      }
+      #originalTitle {
+        font-size: 2rem;
+        font-weight: bold;
+      }
+      #rating {
+        color: #80ff80;
+        font-size: 1.2rem;
+      }
+      /* Cast section */
+      .cast-title {
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin: 20px 0;
+      }
+      .carousel-inner .carousel-item img {
+        border-radius: 10px;
+        height: 200px;
+        width: auto;
+        object-fit: cover;
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+      <img
+        src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ4u1QJ4rpztfF6GoMOiexsWvgGs9LzjFTdcd7r14vmQhJajmOB4eKeAJMYtaQoG4t0iQ&usqp=CAU"
+        alt="TMDB Logo"
+        width="154px"
+        height="50px"
+      />
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-toggle="collapse"
+        data-target="#navbarNav"
+        aria-controls="navbarNav"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="#" id="home">HOME</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#" id="top-rated">TOP RATED</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#" id="upcoming">UPCOMING</a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <div class="row" id="product-container">
+            
+    </div>
+
+    <img id="bgMovieImg" src="" alt="Background Movie Image" />
+
+    <div class="container">
+      <div class="col-3">
+        <img id="movieImg" src="" alt="Movie Poster" />
+      </div>
+      <div class="movie-details col-9">
+        <h1 id="originalTitle">Movie Title</h1>
+        <h3 id="rating">Rating: 80%</h3>
+        <h6 id="releaseDate">Release Date: YYYY-MM-DD</h6>
+        <p id="overview">Movie overview goes here...</p>
+      </div>
+    </div>
+
+    <hr />
+
+    <div class="container">
+      <h2 class="cast-title">Series Cast</h2>
+      <div class="row" id="castCards">
+      </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const movieId = localStorage.getItem("selectedMovieId");
+        const apiKey = "c45a857c193f6302f2b5061c3b85e743";
+
+        if (movieId) {
+          fetch(
+            `https://api.themoviedb.org/3/movie/${movieId}?api_key=${apiKey}&language=en-US`
+          )
+            .then((response) => response.json())
+            .then((movie) => {
+              document.getElementById("bgMovieImg").src =
+                "https://image.tmdb.org/t/p/w1280" + movie.backdrop_path;
+              document.getElementById("movieImg").src =
+                "https://image.tmdb.org/t/p/w500" + movie.poster_path;
+              document.getElementById("originalTitle").textContent =
+                movie.original_title;
+              document.getElementById("rating").textContent = `RATING: ${
+                movie.vote_average
+              }`;
+              document.getElementById(
+                "releaseDate"
+              ).textContent = `Release Date: ${movie.release_date}`;
+              document.getElementById("overview").textContent = movie.overview;
+            });
+
+          fetch(
+            `https://api.themoviedb.org/3/movie/${movieId}/credits?api_key=${apiKey}&language=en-US`
+          )
+            .then((response) => response.json())
+            .then((data) => {
+              const castCards = document.getElementById("castCards");
+              data.cast.slice(0, 10).forEach((cast) => {
+                const card = document.createElement("div");
+                card.classList.add(
+                  "col-12",
+                  "col-sm-6",
+                  "col-md-4",
+                  "col-lg-3",
+                  "mb-4"
+                );
+
+                card.innerHTML = `
+                        <div class="card h-100 bg-dark text-white">
+                            <img src="${
+                              cast.profile_path
+                                ? "https://image.tmdb.org/t/p/w200" +
+                                  cast.profile_path
+                                : "https://via.placeholder.com/200x300?text=No+Image"
+                            }" class="card-img-top" alt="${cast.name}">
+                            <div class="card-body">
+                                <h5 class="card-title">${cast.name}</h5>
+                                <p class="card-text">as ${cast.character}</p>
+                            </div>
+                        </div>
+                    `;
+                castCards.appendChild(card);
+              });
+            });
+        }
+      });
+    </script>
+  </body>
+
+  <script src="script.js"></script>
+</html>
