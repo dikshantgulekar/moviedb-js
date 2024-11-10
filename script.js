@@ -190,7 +190,7 @@ document.getElementById('searchMovie').onclick = function(ev){
 function viewMovie(movieId){
     console.log(movieId)
     localStorage.setItem('selectedMovieId', movieId);
-    window.location.href = 'movieDetail.html'
+    window.location.href = "movieDetail.html"
 }
 
 document.addEventListener("DOMContentLoaded", function () {
